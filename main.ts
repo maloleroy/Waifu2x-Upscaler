@@ -1,4 +1,4 @@
-import {app, BrowserWindow, dialog, globalShortcut, ipcMain, shell} from "electron"
+import {app, BrowserWindow, Menu, MenuItemConstructorOptions, dialog, ipcMain, shell} from "electron"
 import Store from "electron-store"
 import dragAddon from "electron-click-drag-plugin"
 import fs from "fs"
@@ -9,6 +9,7 @@ import waifu2x from "waifu2x"
 import imagesMeta from "images-meta"
 import functions from "./structures/functions"
 import mainFunctions from "./structures/mainFunctions"
+import pack from "./package.json"
 
 process.setMaxListeners(0)
 let window: Electron.BrowserWindow | null
@@ -615,6 +616,42 @@ ipcMain.handle("select-directory", async (event, dir: string) => {
   }
 })
 
+ipcMain.handle("context-menu", (event, {hasSelection}) => {
+  const template: MenuItemConstructorOptions[] = [
+    {label: "Copy", enabled: hasSelection, role: "copy"},
+    {label: "Paste", role: "paste"}
+  ]
+
+  const menu = Menu.buildFromTemplate(template)
+  const window = BrowserWindow.fromWebContents(event.sender)
+  if (window) menu.popup({window})
+})
+
+const applicationMenu = () =>  {
+  const template: MenuItemConstructorOptions[] = [
+    {role: "appMenu"},
+    {
+      label: "Edit",
+      submenu: [
+        {role: "copy"},
+        {role: "paste"}
+      ]
+    },
+    {role: "windowMenu"},
+    {
+      role: "help",
+      submenu: [
+        {role: "reload"},
+        {role: "forceReload"},
+        {role: "toggleDevTools"},
+        {type: "separator"},
+        {label: "Online Support", click: () => shell.openExternal(pack.repository.url)}
+      ]
+    }
+  ]
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template))
+}
+
 const singleLock = app.requestSingleInstanceLock()
 
 if (!singleLock) {
@@ -629,19 +666,20 @@ if (!singleLock) {
 
   app.on("ready", () => {
     window = new BrowserWindow({width: 800, height: 600, minWidth: 720, minHeight: 450, frame: false, 
-      backgroundColor: "#5ea8da", center: true, webPreferences: {
+      show: false, backgroundColor: "#5ea8da", center: true, webPreferences: {
       preload: path.join(__dirname, "../preload/index.js")}})
     window.loadFile(path.join(__dirname, "../renderer/index.html"))
     window.removeMenu()
+    applicationMenu()
     if (process.platform !== "win32") {
       //if (ffmpegPath) fs.chmodSync(ffmpegPath, "777")
       //waifu2x.chmod777(waifu2xPath, webpPath, esrganPath, cuganPath, anime4kPath, rifePath)
     }
+    window.webContents.on("did-finish-load", () => {
+      window?.show()
+    })
     window.on("closed", () => {
       window = null
-    })
-    globalShortcut.register("Control+Shift+I", () => {
-      window?.webContents.toggleDevTools()
     })
   })
 }

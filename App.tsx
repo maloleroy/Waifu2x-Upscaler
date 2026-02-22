@@ -12,6 +12,7 @@ import GroupAction from "./components/GroupAction"
 import LogoBar from "./components/LogoBar"
 import Preview from "./components/Preview"
 import TitleBar from "./components/TitleBar"
+import ContextMenu from "./components/ContextMenu"
 import LocalStorage from "./LocalStorage"
 import "./index.less"
 
@@ -20,6 +21,7 @@ const App = () => {
     <main className="app">
         <TitleBar/>
         <AdvancedSettings/>
+        <ContextMenu/>
         <LocalStorage/>
         <Preview/>
         <LogoBar/>
