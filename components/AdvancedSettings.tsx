@@ -36,7 +36,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
             window.ipcRenderer.removeListener("show-settings-dialog", showSettingsDialog)
             window.ipcRenderer.removeListener("close-all-dialogs", closeAllDialogs)
         }
-    }, [])
+    }, [advSettings])
 
     const initSettings = async () => {
         const settings = await window.ipcRenderer.invoke("init-settings")

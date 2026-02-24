@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react"
 import {useDropzone} from "react-dropzone"
 import FileSelectorIcon from "../assets/svg/file-selector.svg"
+import FileSelectorDragIcon from "../assets/svg/file-selector-drag.svg"
 import "./styles/fileselector.less"
 
 const FileSelector: React.FunctionComponent = (props) => {
@@ -78,7 +79,9 @@ const FileSelector: React.FunctionComponent = (props) => {
     return (
         <section className="file-selector" {...getRootProps()}>
             <div className="file-selector-img">
-                <FileSelectorIcon className="file-selector-img-text" style={{filter: setFilter ? "brightness(0) invert(1)" : ""}}/>
+                {isDragActive ?
+                <FileSelectorDragIcon className="file-selector-img-text" style={{filter: setFilter ? "brightness(0) invert(1)" : ""}}/> :
+                <FileSelectorIcon className="file-selector-img-text" style={{filter: setFilter ? "brightness(0) invert(1)" : ""}}/>}
             </div>
             <div className="file-selector-hover" onClick={selectFiles} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}></div>
         </section>

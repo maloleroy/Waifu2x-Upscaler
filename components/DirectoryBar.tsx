@@ -5,10 +5,7 @@ import SourceIcon from "../assets/svg/source.svg"
 import functions from "../structures/functions"
 import "./styles/directorybar.less"
 
-const DirectoryBar: React.FunctionComponent = (props) => {
-    const [defaultDir, setDefaultDir] = useState("")
-    const [folderHover, setFolderHover] = useState(false)
-    const [sourceHover, setSourceHover] = useState(false)
+const DirectoryBar: React.FunctionComponent = () => {
     const {directory} = useUpscaleSelector()
     const {setDirectory} = useUpscaleActions()
     const [source, setSource] = useState(false)
@@ -17,7 +14,6 @@ const DirectoryBar: React.FunctionComponent = (props) => {
         window.ipcRenderer.invoke("get-downloads-folder").then((f) => {
             f = f.replace(/\\/g, "/")
             if (!f.endsWith("/")) f = `${f}/`
-            setDefaultDir(f)
             setDirectory(f)
             setSource(false)
         })
@@ -28,7 +24,6 @@ const DirectoryBar: React.FunctionComponent = (props) => {
         if (dir) {
             dir = dir.replace(/\\/g, "/")
             if (!dir.endsWith("/")) dir = `${dir}/`
-            setDefaultDir(dir)
             setDirectory(dir)
             setSource(false)
         }
@@ -36,13 +31,8 @@ const DirectoryBar: React.FunctionComponent = (props) => {
 
     const updateDirectory = (event: React.ChangeEvent<HTMLInputElement>) => {
         const dir = event.target.value.replace(/\\/g, "/")
-        if (!dir.includes(defaultDir)) {
-            setDirectory(defaultDir)
-            window.ipcRenderer.invoke("select-directory", defaultDir)
-        } else {
-            setDirectory(dir)
-            window.ipcRenderer.invoke("select-directory", dir)
-        }
+        setDirectory(dir)
+        window.ipcRenderer.invoke("select-directory", dir)
     }
 
     const openDirectory = () => {
@@ -56,14 +46,12 @@ const DirectoryBar: React.FunctionComponent = (props) => {
             window.ipcRenderer.invoke("get-downloads-folder", true).then((f) => {
                 f = f.replace(/\\/g, "/")
                 if (!f.endsWith("/")) f = `${f}/`
-                setDefaultDir(f)
                 setDirectory(f)
                 setSource(false)
                 window.ipcRenderer.invoke("select-directory", f)
             })
         } else {
             setSource(true)
-            setDefaultDir("{source}/")
             setDirectory("{source}/")
             window.ipcRenderer.invoke("select-directory", "{source}/")
         }

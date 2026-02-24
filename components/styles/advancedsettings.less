@@ -19,7 +19,7 @@
     pointer-events: all;
     margin-top: -10px;
     width: 60%;
-    height: 85%;
+    height: 93%;
     border-radius: 10px;
     background-color: var(--navColor);
     padding: 10px;
@@ -38,6 +38,7 @@
     align-items: flex-start;
     padding-left: 10px;
     padding-right: 10px;
+    gap: 7px;
 }
 
 .settings-title-container {
@@ -52,11 +53,6 @@
     color: var(--textColor);
     font-size: 20px;
     font-family: "GenEi M Gothic v2", sans-serif;
-    user-select: text;
-    cursor: text;
-    &::selection {
-        background-color: #846eff;
-    }
 }
 
 .settings-row {
@@ -67,14 +63,9 @@
 }
 
 .settings-text {
-    user-select: text;
-    cursor: text;
     color: var(--textColor);
-    font-family: "GenEi M Gothic v2", sans-serif;
-    font-size: 15px;
-    &::selection {
-        background-color: #846eff;
-    }
+    font-family: "Honoka Shin Antique-Kaku", sans-serif;
+    font-size: 14px;
 }
 
 .settings-input {
@@ -82,19 +73,16 @@
     border: none;
     margin-left: 10px;
     width: 50px;
-    font-family: "GenEi M Gothic v2", sans-serif;
-    font-size: 15px;
+    font-family: "Honoka Shin Antique-Kaku", sans-serif;
+    font-size: 14px;
     background-color: transparent;
-    &::selection {
-        background-color: #846eff;
-    }
 }
 
 .settings-checkbox {
     margin-left: 15px;
-    width: 15px;
-    height: 15px;
-    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    color: var(--checkboxColor);
 }
 
 .settings-button-container {
@@ -112,15 +100,14 @@
     padding-bottom: 4px;
     padding-left: 14px;
     padding-right: 14px;
-    color: var(--textColor);
+    color: var(--textColor2);
     font-size: 20px;
-    font-family: "GenEi M Gothic v2", sans-serif;
+    font-family: "Honoka Shin Antique-Kaku", sans-serif;
     background-color: var(--clearAllButton);
-    border: 3px solid var(--textColor);
+    border: 3px solid var(--textColor2);
     &:hover {
         color: white;
         border: 3px solid white;
-        cursor: pointer;
     }
 }
 
@@ -130,15 +117,14 @@
     padding-bottom: 4px;
     padding-left: 14px;
     padding-right: 14px;
-    color: var(--textColor);
+    color: var(--textColor2);
     font-size: 20px;
-    font-family: "Maven Pro", sans-serif;
+    font-family: "Honoka Shin Antique-Kaku", sans-serif;
     background-color: var(--startAllButton);
-    border: 3px solid var(--textColor);
+    border: 3px solid var(--textColor2);
     &:hover {
         color: white;
         border: 3px solid white;
-        cursor: pointer;
     }
 }
 
@@ -147,5 +133,5 @@
 }
 
 .btn-filter {
-    filter: hue-rotate(19deg) brightness(0.7) saturate(3);
+    filter: hue-rotate(10deg) brightness(0.9) saturate(1.2);
 }

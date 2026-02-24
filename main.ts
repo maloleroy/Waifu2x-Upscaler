@@ -205,6 +205,7 @@ ipcMain.handle("quick-process", async () => {
     properties: ["openFile"]
   })
   const file = files.filePaths[0]
+  if (!file) return
   quickProcess(file)
 })
 
@@ -665,7 +666,7 @@ if (!singleLock) {
   })
 
   app.on("ready", () => {
-    window = new BrowserWindow({width: 800, height: 600, minWidth: 720, minHeight: 450, frame: false, 
+    window = new BrowserWindow({width: 800, height: 640, minWidth: 720, minHeight: 450, frame: false, 
       show: false, backgroundColor: "#5ea8da", center: true, webPreferences: {
       preload: path.join(__dirname, "../preload/index.js")}})
     window.loadFile(path.join(__dirname, "../renderer/index.html"))

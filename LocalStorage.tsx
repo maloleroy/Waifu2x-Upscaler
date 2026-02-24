@@ -3,7 +3,7 @@ import {useThemeSelector, useThemeActions} from "./store"
 import {Themes, OS} from "./reducers/themeReducer"
 
 const lightColorList = {
-	"--iconColor": "#69e8ff",
+	"--iconColor": "#89ddff",
 	"--waifu2xColor": "#00fdfd",
 	"--closeButton": "#499bff",
 	"--minimizeButton": "#39bdff",
@@ -12,6 +12,7 @@ const lightColorList = {
 	"--background": "#92dbff",
 	"--textColor": "#000000",
 	"--strokeColor": "#000000",
+	"--hoverColor": "#ffffff",
 	"--textboxColor": "#70b7de",
 	"--startAllButton": "#81a2ff",
 	"--clearAllButton": "#7595ff",
@@ -26,11 +27,11 @@ const lightColorList = {
 	"--textColor2": "#000000",
 	"--titleColor": "#69ebff",
 	"--checkboxColor": "#4970ff",
-	"--iconColor2": "#59f59f"
+	"--iconColor2": "#5599FF"
 }
 
 const darkColorList = {
-	"--iconColor": "#67e3ff",
+	"--iconColor": "#89ddff",
 	"--waifu2xColor": "#00fdfd",
 	"--closeButton": "#499bff",
 	"--minimizeButton": "#39bdff",
@@ -39,6 +40,7 @@ const darkColorList = {
 	"--background": "#0e1a30",
 	"--textColor": "#ffffff",
 	"--strokeColor": "#000000",
+	"--hoverColor": "#000000",
 	"--textboxColor": "#1c3358",
 	"--startAllButton": "#81a2ff",
 	"--clearAllButton": "#7595ff",
@@ -53,7 +55,7 @@ const darkColorList = {
 	"--textColor2": "#000000",
 	"--titleColor": "#71e3ff",
 	"--checkboxColor": "#4970ff",
-	"--iconColor2": "#6ec7ff"
+	"--iconColor2": "#6EC7FF"
 }
 
 const LocalStorage: React.FunctionComponent = () => {
