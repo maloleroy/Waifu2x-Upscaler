@@ -11,7 +11,7 @@ declare global {
     },
     shell: {
       openPath: (path: string) => Promise<string>
-      showItemInFolder: (path: string) => void
+      showItemInFolder: (path: string) => Promise<void>
     }
   }
 }
@@ -36,8 +36,8 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
 })
 
 contextBridge.exposeInMainWorld("shell", {
-    openPath: async (path: string) => shell.openPath(path),
-    showItemInFolder: (path: string) => shell.showItemInFolder(path)
+    openPath: async (location: string) => ipcRenderer.invoke("shell:openPath", location),
+    showItemInFolder: async (location: string) => ipcRenderer.invoke("shell:showItemInFolder", location)
 })
 
 contextBridge.exposeInMainWorld("platform", process.platform === "darwin" ? "mac" : "windows")

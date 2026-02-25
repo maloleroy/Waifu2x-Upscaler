@@ -31,8 +31,8 @@ const GroupAction: React.FunctionComponent = (props) => {
     if (clearAll) {
         return (
             <section className="group-action-container">
-                <button className="group-action-button" onClick={start}>{">>Start All"}</button>
-                <button className="group-action-button" onClick={clear}>{">>Clear All"}</button>
+                <button className="group-action-button" onClick={start} style={{backgroundColor: "var(--startAllButton)"}}>{">> Start All"}</button>
+                <button className="group-action-button" onClick={clear} style={{backgroundColor: "var(--clearAllButton)"}}>{">> Clear All"}</button>
             </section>
         )
     }

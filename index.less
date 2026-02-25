@@ -57,15 +57,15 @@
 	--strokeColor: #000000;
 	--hoverColor: #000000;
 	--textboxColor: #1c3358;
-	--startAllButton: #81a2ff;
-	--clearAllButton: #7595ff;
+	--startAllButton: #4E6AB5;
+	--clearAllButton: #506BC4;
 	--contractButton: #92d2ff;
 	--arrowColor: #93f1ff;
 	--locationButton: #92c5ff;
 	--trashButton: #4995ff;
 	--itemBG: #131f3a;
 	--itemStroke: #16223d;
-	--stopButton: #688bff;
+	--stopButton: #324A86;
 	--finishedColor: #80ffdd;
 	--textColor2: #000000;
 	--titleColor: #71e3ff;
@@ -115,25 +115,8 @@ p {
     height: 100%;
 }
 
-::selection {
-    background-color: var(--selectionColor);
-    color: white;
-}
-
-::-webkit-scrollbar {
-    width: 20px;
-}
-  
-::-webkit-scrollbar-track {
-    background: #000000;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #5a5a5a;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #303030;
+*::-webkit-scrollbar {
+    display: none;
 }
 
 input[type="search"]::-webkit-search-decoration,
@@ -159,6 +142,17 @@ img {
     image-rendering: -webkit-optimize-contrast;
 }
 
-ul {
-    list-style-type: none;
+ul, li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
+
+button {
+	border: none;
+	outline: none;
+	&:hover {
+		cursor: default;
+	}
+}
+

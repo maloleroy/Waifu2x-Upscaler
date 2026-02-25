@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react"
 import {useUpscaleSelector, useActionActions} from "../store"
-import Reorder from "react-reorder"
+import {ReactSortable} from "react-sortablejs"
 import FileContainer from "./FileContainer"
 import "./styles/filecontainerlist.less"
 
@@ -76,22 +76,16 @@ const FileContainerList: React.FunctionComponent = (props) => {
         })
     }
 
-    const reorder = (event: React.MouseEvent, from: number, to: number) => {
-        setContainers((prev) => {
-            const newState = [...prev]
-            newState.splice(to, 0, newState.splice(from, 1)[0])
-            return newState
-        })
-    }
-
     return (
-        <Reorder reorderId="file-containers" component="ul" holdTime={50} onReorder={reorder}>{
-            containers.map((c) => (
+        <ReactSortable tag="ul" list={containers} setList={setContainers} animation={150}
+            ghostClass="list-ghost" chosenClass="list-chosen" dragClass="list-drag"
+            forceFallback={true} fallbackOnBody={true}>
+            {containers.map((c) => (
                 <li key={c.id}>
                     {c.jsx}
                 </li>
-            ))
-        }</Reorder>
+            ))}
+        </ReactSortable>
     )
 }
 

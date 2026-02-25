@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react"
+import React, {useEffect, useEffectEvent, useState} from "react"
 import {useDropzone} from "react-dropzone"
 import FileSelectorIcon from "../assets/svg/file-selector.svg"
 import FileSelectorDragIcon from "../assets/svg/file-selector-drag.svg"
@@ -27,6 +27,7 @@ const FileSelector: React.FunctionComponent = (props) => {
             setColor(color)
         }
         window.ipcRenderer.on("add-file", addFile)
+        window.ipcRenderer.on("open-file", selectFiles)
         window.ipcRenderer.on("update-color", updateColor)
         document.addEventListener("dragover", dragOver)
         document.addEventListener("dragleave", dragLeave)
@@ -34,6 +35,7 @@ const FileSelector: React.FunctionComponent = (props) => {
         return () => {
             window.ipcRenderer.removeListener("add-file", addFile)
             window.ipcRenderer.removeListener("update-color", updateColor)
+            window.ipcRenderer.removeListener("open-file", selectFiles)
             document.removeEventListener("dragover", dragOver)
             document.removeEventListener("dragleave", dragLeave)
             document.removeEventListener("drop", dragLeave)
@@ -58,7 +60,7 @@ const FileSelector: React.FunctionComponent = (props) => {
 
     const {getRootProps, isDragActive} = useDropzone({onDrop})
 
-    const selectFiles = async () => {
+    const selectFiles = useEffectEvent(async () => {
         setHover(false)
         const files = await window.ipcRenderer.invoke("select-files")
         if (files[0]) {
@@ -73,7 +75,7 @@ const FileSelector: React.FunctionComponent = (props) => {
             }
             window.ipcRenderer.invoke("add-files", files, identifers)
         }
-    }
+    })
 
     const setFilter = drag ? isDragActive : hover
     return (

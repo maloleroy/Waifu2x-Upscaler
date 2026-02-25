@@ -43,14 +43,14 @@ if (process.platform === "win32") {
 }
 
 if (!fs.existsSync(ffmpegPath)) ffmpegPath = undefined
-if (!fs.existsSync(modelPath)) modelPath = path.join(__dirname, "../models")
-if (!fs.existsSync(waifu2xPath)) waifu2xPath = path.join(__dirname, "../waifu2x")
-if (!fs.existsSync(esrganPath)) esrganPath = path.join(__dirname, "../real-esrgan")
-if (!fs.existsSync(cuganPath)) cuganPath = path.join(__dirname, "../real-cugan")
-if (!fs.existsSync(anime4kPath)) anime4kPath = path.join(__dirname, "../anime4k")
-if (!fs.existsSync(webpPath)) webpPath = path.join(__dirname, "../webp")
-if (!fs.existsSync(scriptsPath)) scriptsPath = path.join(__dirname, "../scripts")
-if (!fs.existsSync(rifePath)) rifePath = path.join(__dirname, "../rife")
+if (!fs.existsSync(modelPath)) modelPath = path.join(__dirname, "../../models")
+if (!fs.existsSync(waifu2xPath)) waifu2xPath = path.join(__dirname, "../../waifu2x")
+if (!fs.existsSync(esrganPath)) esrganPath = path.join(__dirname, "../../real-esrgan")
+if (!fs.existsSync(cuganPath)) cuganPath = path.join(__dirname, "../../real-cugan")
+if (!fs.existsSync(anime4kPath)) anime4kPath = path.join(__dirname, "../../anime4k")
+if (!fs.existsSync(webpPath)) webpPath = path.join(__dirname, "../../webp")
+if (!fs.existsSync(scriptsPath)) scriptsPath = path.join(__dirname, "../../scripts")
+if (!fs.existsSync(rifePath)) rifePath = path.join(__dirname, "../../rife")
 
 const store = new Store()
 
@@ -85,6 +85,14 @@ ipcMain.on("moveWindow", (event) => {
   if (!handle) return
   const windowID = process.platform === "linux" ? handle.readUInt32LE(0) : handle
   dragAddon.startDrag(windowID)
+})
+
+ipcMain.handle("shell:openPath", (event, location: string) => {
+  shell.openPath(path.normalize(location))
+})
+
+ipcMain.handle("shell:showItemInFolder", (event, location: string) => {
+  shell.showItemInFolder(path.normalize(location))
 })
 
 const quickProcess = async (image: string) => {
@@ -631,6 +639,19 @@ ipcMain.handle("context-menu", (event, {hasSelection}) => {
 const applicationMenu = () =>  {
   const template: MenuItemConstructorOptions[] = [
     {role: "appMenu"},
+    {
+      label: "File",
+      submenu: [
+        {
+          label: "Open", 
+          accelerator: "CmdOrCtrl+O",
+          click: (item, window) => {
+            const win = window as BrowserWindow
+            win.webContents.send("open-file")
+          }
+        }
+      ]
+    },
     {
       label: "Edit",
       submenu: [

@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState, useReducer} from "react"
-import {useUpscaleSelector, useActionSelector} from "../store"
+import {useUpscaleSelector, useActionSelector, useThemeSelector} from "../store"
 import {ProgressBar} from "react-bootstrap"
 import pSBC from "shade-blend-color"
 import RightArrowIcon from "../assets/svg/right-arrow.svg"
@@ -29,17 +29,13 @@ let mouseStopped = false
 let timer = null as any
 
 const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileContainerProps) => {
+    const {theme} = useThemeSelector()
     const {videoQuality, gifQuality, pngCompression, jpgQuality, parallelFrames, threads, 
         rename, pitch, sdColorSpace, gifTransparency, upscaler, compress, pngFrames, pdfDownscale, 
         pythonDownscale, fpsMultiplier, speed, scale, directory, noise, mode, reverse
     } = useUpscaleSelector()
     const {previewVisible} = useActionSelector()
     const [hover, setHover] = useState(false)
-    const [hoverClose, setHoverClose] = useState(false)
-    const [hoverLocation, setHoverLocation] = useState(false)
-    const [hoverTrash, setHoverTrash] = useState(false)
-    const [hoverStart, setHoverStart] = useState(false)
-    const [hoverStop, setHoverStop] = useState(false)
     const [output, setOutput] = useState("")
     const [outputImage, setOutputImage] = useState("")
     const [started, setStarted] = useState(false)
@@ -130,9 +126,12 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     useEffect(() => {
         updateProgressColor()
         updateBackgroundColor()
+    })
+
+    useEffect(() => {
         if (!started && startSignal) startConversion(true)
         if ((!started || output) && clearSignal) closeConversion()
-    })
+    }, [started, startSignal, output, clearSignal])
 
     const startConversion = (startAll?: boolean) => {
         if (started) return
@@ -175,29 +174,20 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     }
 
     const updateBackgroundColor = async () => {
-        const colors = ["#2c9bf6", "#4d7fff", "#4f5eff", "#3b7cff", "#2b92ff", "#47a6ff"]
         const container = fileContainerRef.current?.querySelector(".file-container") as HTMLElement
         if (!container) return
-        if (!backgroundColor) {
+        const theme = await window.ipcRenderer.invoke("get-theme")
+        
+        const colors = theme === "light" ?
+            ["#87c9ff", "#91b0ff", "#949dff", "#c4d8ff", "#82bfff", "#78a2ff"] :
+            ["#131f3a", "#13183a", "#13213a", "#131e36", "#121733", "#12112e"]
+
+        if (!colors.includes(backgroundColor)) {
             const color = colors[Math.floor(Math.random() * colors.length)]
             setBackgroundColor(color)
         }
-        const theme = await window.ipcRenderer.invoke("get-theme")
-        if (theme === "light") {
-            const text = fileContainerRef.current?.querySelectorAll(".file-text, .file-text-alt") as NodeListOf<HTMLElement>
-            text.forEach((t) => {
-                t.style.color = "black"
-            })
-            container.style.backgroundColor = backgroundColor
-            container.style.border = `4px solid ${pSBC(0.1, backgroundColor)}`
-        } else {
-            const text = fileContainerRef.current?.querySelectorAll(".file-text, .file-text-alt") as NodeListOf<HTMLElement>
-            text.forEach((t) => {
-                t.style.color = backgroundColor
-            })
-            container.style.backgroundColor = "#090409"
-            container.style.border = `4px solid #090409`
-        }
+        container.style.backgroundColor = backgroundColor
+        container.style.border = `4px solid ${pSBC(0.1, backgroundColor)}`
     }
 
     const updateProgressColor = () => {
@@ -269,9 +259,11 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
     }
 
     const preview = (event: React.MouseEvent<HTMLElement>) => {
+        event.preventDefault()
+        event.stopPropagation()
         const source = getSource()
         if (event.ctrlKey) return window.ipcRenderer.invoke("add-file", source, props.id)
-        if (event.button === 2 && !drag) {
+        if (event.type === "contextmenu" && !drag) {
             if (frame) return window.ipcRenderer.invoke("preview", frame, "image")
             window.ipcRenderer.invoke("preview", source, props.type)
         }
@@ -317,11 +309,11 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
 
     const getThumbnail = () => {
         if (props.type === "video") {
-            if (frame) return <img className="file-img" onMouseDown={delayPress} onMouseUp={preview} src={frame}/>
-            return <video className="file-img" onMouseDown={delayPress} onMouseUp={preview} muted autoPlay loop><source src={getSource()}></source></video>
+            if (frame) return <img className="file-img" onMouseDown={delayPress} onContextMenu={preview} src={frame}/>
+            return <video className="file-img" onMouseDown={delayPress} onContextMenu={preview} muted autoPlay loop><source src={getSource()}></source></video>
         } else {
-            if (frame) return <img className="file-img" onMouseDown={delayPress} onMouseUp={preview} src={frame}/>
-            return <img className="file-img" onMouseDown={delayPress} onMouseUp={preview} src={getSource()}/>
+            if (frame) return <img className="file-img" onMouseDown={delayPress} onContextMenu={preview} src={frame}/>
+            return <img className="file-img" onMouseDown={delayPress} onContextMenu={preview} src={getSource()}/>
         }
     }
 
@@ -394,13 +386,13 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
             <div className="file-buttons">
                 {hover ? <CloseContainerIcon className="file-button close-container" onClick={closeConversion}/> : null}
                 <div className="file-button-row">
-                    <button className="file-button start-button" onClick={() => {started ? stopConversion() : startConversion()}}>
+                    <button className="start-button" onClick={() => {started ? stopConversion() : startConversion()}}>
                         {started ? "Stop" : "Start"}
                     </button>
                 </div>
                 <div className="file-button-row">
-                    {output ? <LocationIcon className="file-button" onClick={() => openLocation()}/> : null}
-                    {output ? <TrashIcon className="file-button" onClick={() => deleteConversion()}/> : null}
+                    {output ? <LocationIcon className="file-button" onClick={() => openLocation()} style={{color: "var(--locationButton)"}}/> : null}
+                    {output ? <TrashIcon className="file-button" onClick={() => deleteConversion()} style={{color: "var(--trashButton)"}}/> : null}
                 </div>
             </div>
             </div>
