@@ -13,6 +13,7 @@ const lightColorList = {
 	"--textColor": "#000000",
 	"--strokeColor": "#000000",
 	"--hoverColor": "#ffffff",
+	"--selectorColor": "#6eb2ff",
 	"--textboxColor": "#70b7de",
 	"--startAllButton": "#81a2ff",
 	"--clearAllButton": "#7595ff",
@@ -38,6 +39,7 @@ const darkColorList = {
 	"--maximizeButton": "#2edcff",
 	"--navColor": "#1d2e4f",
 	"--background": "#0e1a30",
+	"--selectorColor": "#1d2e4f",
 	"--textColor": "#ffffff",
 	"--strokeColor": "#000000",
 	"--hoverColor": "#000000",
@@ -59,18 +61,24 @@ const darkColorList = {
 }
 
 const LocalStorage: React.FunctionComponent = () => {
-    const {theme, os} = useThemeSelector()
-    const {setTheme, setOS} = useThemeActions()
+    const {theme, os, transparent, pinned} = useThemeSelector()
+    const {setTheme, setOS, setTransparent, setPinned} = useThemeActions()
 
     useEffect(() => {
         if (typeof window === "undefined") return
         const colorList = theme.includes("light") ? lightColorList : darkColorList
+
         for (let i = 0; i < Object.keys(colorList).length; i++) {
             const key = Object.keys(colorList)[i]
             const color = Object.values(colorList)[i]
             document.documentElement.style.setProperty(key, color)
         }
-    }, [theme])
+
+        if (transparent) {
+            document.documentElement.style.setProperty("--background", "transparent")
+            document.documentElement.style.setProperty("--navColor", "transparent")
+        }
+    }, [theme, transparent])
 
     useEffect(() => {
         const initTheme = async () => {
@@ -96,6 +104,30 @@ const LocalStorage: React.FunctionComponent = () => {
     useEffect(() => {
         window.ipcRenderer.invoke("save-os", os)
     }, [os])
+
+	useEffect(() => {
+        const initTransparent = async () => {
+            const savedTransparent = await window.ipcRenderer.invoke("get-transparent")
+            if (savedTransparent) setTransparent(savedTransparent)
+        }
+        initTransparent()
+    }, [])
+
+    useEffect(() => {
+        window.ipcRenderer.invoke("save-transparent", transparent)
+    }, [transparent])
+
+    useEffect(() => {
+        const initPinned = async () => {
+            const savedPinned = await window.ipcRenderer.invoke("get-pinned")
+            if (savedPinned) setPinned(savedPinned)
+        }
+        initPinned()
+    }, [])
+
+    useEffect(() => {
+        window.ipcRenderer.invoke("save-pinned", pinned)
+    }, [pinned])
 
     return null
 }

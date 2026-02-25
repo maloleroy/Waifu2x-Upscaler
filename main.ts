@@ -255,6 +255,23 @@ ipcMain.handle("save-os", (event, os: string) => {
   store.set("os", os)
 })
 
+ipcMain.handle("get-transparent", () => {
+  return store.get("transparent", false)
+})
+
+ipcMain.handle("save-transparent", (event, transparent: boolean) => {
+  store.set("transparent", transparent)
+})
+
+ipcMain.handle("get-pinned", () => {
+  return store.get("pinned", false)
+})
+
+ipcMain.handle("save-pinned", (event, pinned: boolean) => {
+  store.set("pinned", pinned)
+  window?.setAlwaysOnTop(pinned)
+})
+
 ipcMain.handle("open-location", async (event, location: string, create?: boolean) => {
   if (create && !fs.existsSync(location)) fs.mkdirSync(location, {recursive: true})
   if (!fs.existsSync(location)) return
@@ -688,7 +705,7 @@ if (!singleLock) {
 
   app.on("ready", () => {
     window = new BrowserWindow({width: 800, height: 640, minWidth: 720, minHeight: 450, frame: false, 
-      show: false, backgroundColor: "#5ea8da", center: true, webPreferences: {
+      transparent: true, show: false, backgroundColor: "#00000000", center: true, webPreferences: {
       preload: path.join(__dirname, "../preload/index.js")}})
     window.loadFile(path.join(__dirname, "../renderer/index.html"))
     window.removeMenu()
