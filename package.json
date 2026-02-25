@@ -1,6 +1,6 @@
 {
   "name": "waifu2x-upscaler",
-  "version": "0.9.9",
+  "version": "1.0.0",
   "description": "An app that upscales anime images with waifu2x",
   "main": "dist/main/index.js",
   "scripts": {
