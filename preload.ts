@@ -1,4 +1,4 @@
-import {contextBridge, ipcRenderer, clipboard, shell, IpcRendererEvent} from "electron"
+import {contextBridge, ipcRenderer, webUtils, IpcRendererEvent} from "electron"
 
 declare global {
   interface Window {
@@ -12,6 +12,9 @@ declare global {
     shell: {
       openPath: (path: string) => Promise<string>
       showItemInFolder: (path: string) => Promise<void>
+    },
+    webUtils: {
+      getPathForFile: (file: File) => string
     }
   }
 }
@@ -33,6 +36,10 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
     removeListener: (channel: string, listener: (...args: any[]) => void) => {
         ipcRenderer.removeListener(channel, listener)
     }
+})
+
+contextBridge.exposeInMainWorld("webUtils", {
+    getPathForFile: (file: File) => webUtils.getPathForFile(file)
 })
 
 contextBridge.exposeInMainWorld("shell", {

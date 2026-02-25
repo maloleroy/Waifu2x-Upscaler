@@ -1,5 +1,4 @@
 import React, {useEffect, useEffectEvent, useState} from "react"
-import {useDropzone} from "react-dropzone"
 import FileSelectorIcon from "../assets/svg/file-selector.svg"
 import FileSelectorDragIcon from "../assets/svg/file-selector-drag.svg"
 import "./styles/fileselector.less"
@@ -17,33 +16,28 @@ const FileSelector: React.FunctionComponent = (props) => {
                 return prev + 1
             })
         }
-        const dragOver = () => {
-            setDrag(true)
-        }
-        const dragLeave = () => {
-            setDrag(false)
-        }
         const updateColor = (event: any, color: string) => {
             setColor(color)
         }
         window.ipcRenderer.on("add-file", addFile)
         window.ipcRenderer.on("open-file", selectFiles)
         window.ipcRenderer.on("update-color", updateColor)
-        document.addEventListener("dragover", dragOver)
-        document.addEventListener("dragleave", dragLeave)
-        document.addEventListener("drop", dragLeave)
         return () => {
             window.ipcRenderer.removeListener("add-file", addFile)
             window.ipcRenderer.removeListener("update-color", updateColor)
             window.ipcRenderer.removeListener("open-file", selectFiles)
-            document.removeEventListener("dragover", dragOver)
-            document.removeEventListener("dragleave", dragLeave)
-            document.removeEventListener("drop", dragLeave)
         }
     }, [])
 
-    const onDrop = async (files: any) => {
-        files = files.map((f: any) => f.path)
+    const drop = useEffectEvent(async (event: React.DragEvent) => {
+        event.preventDefault()
+        setDrag(false)
+
+        let files = [] as string[]
+        for (let i = 0; i < event.dataTransfer.files.length; i++) {
+            files.push(window.webUtils.getPathForFile(event.dataTransfer.files[i]))
+        }
+
         if (files[0]) {
             const identifers = []
             let counter = id
@@ -56,9 +50,16 @@ const FileSelector: React.FunctionComponent = (props) => {
             }
             window.ipcRenderer.invoke("add-files", files, identifers)
         }
+    })
+
+    const dragOver = (event: React.DragEvent) => {
+        event.preventDefault()
+        setDrag(true)
     }
 
-    const {getRootProps, isDragActive} = useDropzone({onDrop})
+    const dragLeave = () => {
+        setDrag(false)
+    }
 
     const selectFiles = useEffectEvent(async () => {
         setHover(false)
@@ -77,13 +78,12 @@ const FileSelector: React.FunctionComponent = (props) => {
         }
     })
 
-    const setFilter = drag ? isDragActive : hover
     return (
-        <section className="file-selector" {...getRootProps()}>
+        <section className="file-selector" onDrop={drop} onDragOver={dragOver} onDragLeave={dragLeave}>
             <div className="file-selector-img">
-                {isDragActive ?
-                <FileSelectorDragIcon className="file-selector-img-text" style={{filter: setFilter ? "brightness(0) invert(1)" : ""}}/> :
-                <FileSelectorIcon className="file-selector-img-text" style={{filter: setFilter ? "brightness(0) invert(1)" : ""}}/>}
+                {drag ?
+                <FileSelectorDragIcon className="file-selector-img-text" style={{filter: hover ? "brightness(0) invert(1)" : ""}}/> :
+                <FileSelectorIcon className="file-selector-img-text" style={{filter: hover ? "brightness(0) invert(1)" : ""}}/>}
             </div>
             <div className="file-selector-hover" onClick={selectFiles} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}></div>
         </section>
