@@ -44,11 +44,9 @@ pip3 install torch torchvision opencv-python Pillow numpy spandrel --compile --f
 
 Our design is available here: https://www.figma.com/design/KXFlnNiiqjK18WgVIqxaVu/Waifu2x-Upscaler
 
-*New design is wip
-
 ### Installation
 
-Download from [releases](https://github.com/Moebytes/Waifu2x-Upscaler/releases.
+Download from [releases](https://github.com/Moebytes/Waifu2x-Upscaler/releases).
 
 ### MacOS
 
