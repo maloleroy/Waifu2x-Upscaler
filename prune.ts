@@ -7,7 +7,7 @@ fs.unlinkSync("./node_modules/waifu2x/models/4x-NMKD-YandereNeo-Superlite.pth")
 
 let windowsFiles = [
     "./node_modules/waifu2x/anime4k/Anime4KCPP_CLI.exe",
-    "./node_modules/waifu2x/anime4k/Anime4KCPP_CLI.dll",
+    "./node_modules/waifu2x/anime4k/Anime4KCPPCore.dll",
     "./node_modules/waifu2x/anime4k/msvcp140.dll",
     "./node_modules/waifu2x/anime4k/opencv_world440.dll",
     "./node_modules/waifu2x/anime4k/vcruntime140.dll",
