@@ -26,9 +26,13 @@ Waifu2x only supports scale factors in multiples of 2 from 1/2/4 and noise level
 
 Real-ESRGAN only supports scale factors between 2-4, and all other options are ignored. By setting the scale factor to 4x, it will use the slower Anime4x model that gives better results, so it is recommended to upscale images at 4x when using Real-ESRGAN.
 
+On Windows you need Vulkan GPU support to use Real-ESRGAN.
+
 ### Real-CUGAN
 
 Real-CUGAN only supports scale factors 1/2/3/4, and noise level -1/0/1/2/3 and only noise 0 and 3 for scale factors 3/4. This is probably the best performing upscaler out of the defaults.
+
+On Windows you need Vulkan GPU support to use Real-CUGAN.
 
 ### Custom Models
 
