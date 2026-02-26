@@ -711,8 +711,7 @@ if (!singleLock) {
     window.removeMenu()
     applicationMenu()
     if (process.platform !== "win32") {
-      //if (ffmpegPath) fs.chmodSync(ffmpegPath, "777")
-      //waifu2x.chmod777(waifu2xPath, webpPath, esrganPath, cuganPath, anime4kPath, rifePath)
+      if (ffmpegPath) fs.chmodSync(ffmpegPath, "777")
     }
     window.webContents.on("did-finish-load", () => {
       window?.show()

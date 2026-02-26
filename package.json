@@ -7,6 +7,7 @@
     "start": "npm run clean && rsbuild build && electron dist/main/index.js",
     "build": "npm run clean ./build && rsbuild build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder -p never",
     "rebuild": "electron-rebuild -f -w @napi-rs/canvas",
+    "prune": "node prune.ts",
     "clean": "del-cli ./dist"
   },
   "keywords": [
@@ -90,6 +91,7 @@
     "asar": true,
     "asarUnpack": [
       "node_modules/waifu2x",
+      "node_modules/rife-fps",
       "node_modules/**/*.node"
     ]
   },
