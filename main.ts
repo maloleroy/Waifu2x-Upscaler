@@ -44,6 +44,7 @@ if (!fs.existsSync(scriptsPath)) scriptsPath = path.join(__dirname, "../../scrip
 if (!fs.existsSync(rifePath)) rifePath = path.join(__dirname, "../../rife")
 
 const store = new Store()
+let initialTransparent = process.platform === "win32" ? store.get("transparent", false) as boolean : true
 
 const history: Array<{id: number, source: string, dest: string, type: "image" | "gif" | "video"}> = []
 const active: Array<{id: number, source: string, dest: string, type: "image" | "gif" | "video", action: null | "stop"}> = []
@@ -696,7 +697,7 @@ if (!singleLock) {
 
   app.on("ready", () => {
     window = new BrowserWindow({width: 800, height: 640, minWidth: 720, minHeight: 450, frame: false, hasShadow: false,
-      transparent: process.platform !== "win32", resizable: true, show: false, backgroundColor: "#00000000", center: true, webPreferences: {
+      transparent: initialTransparent, resizable: true, show: false, backgroundColor: "#00000000", center: true, webPreferences: {
       preload: path.join(__dirname, "../preload/index.js")}})
     window.loadFile(path.join(__dirname, "../renderer/index.html"))
     window.removeMenu()
