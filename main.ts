@@ -202,7 +202,9 @@ ipcMain.handle("quick-process", async () => {
       {name: "All Files", extensions: ["*"]},
       {name: "Images", extensions: ["png", "jpg", "jpeg", "webp", "avif", "jxl"]},
     ],
-    properties: ["openFile"]
+    properties: ["openFile"],
+    buttonLabel: "Quick Process",
+    title: "Quick Process"
   })
   const file = files.filePaths[0]
   if (!file) return
