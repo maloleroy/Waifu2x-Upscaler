@@ -1,3 +1,9 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Waifu2x Upscaler - A cute image upscaler ❤                *
+ * Copyright © 2026 Moebytes <moebytes.com>                  *
+ * Licensed under CC BY-NC 4.0. See license.txt for details. *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 import React, {useEffect, useEffectEvent, useState} from "react"
 import FileSelectorIcon from "../assets/svg/file-selector.svg"
 import FileSelectorDragIcon from "../assets/svg/file-selector-drag.svg"

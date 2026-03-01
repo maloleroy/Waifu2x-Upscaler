@@ -1,3 +1,9 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Waifu2x Upscaler - A cute image upscaler ❤                *
+ * Copyright © 2026 Moebytes <moebytes.com>                  *
+ * Licensed under CC BY-NC 4.0. See license.txt for details. *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 import React, {useEffect, useRef, useState, useReducer} from "react"
 import {useUpscaleSelector, useActionSelector, useThemeSelector} from "../store"
 import {ProgressBar} from "react-bootstrap"
