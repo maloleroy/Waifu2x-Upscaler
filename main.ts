@@ -648,7 +648,6 @@ const setWindowOpacity = (percent: number) => {
   store.set("window-opacity", windowOpacity)
 
   window?.setOpacity(windowOpacity / 100)
-  currentDialog?.setOpacity(windowOpacity / 100)
 
   applicationMenu()
 }
