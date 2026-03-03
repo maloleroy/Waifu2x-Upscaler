@@ -8,7 +8,7 @@ import fs from "fs"
 import path from "path"
 import functions from "./functions"
 
-const images = [".png", ".jpg", ".jpeg", ".webp", ".avif", ".jxl", ".tiff"]
+const images = [".png", ".apng", ".jpg", ".jpeg", ".webp", ".avif", ".jxl", ".tiff"]
 const gifs = [".gif"]
 const videos = [".mp4", ".ogv", ".webm", ".avi", ".mov", ".mkv", ".flv"]
 

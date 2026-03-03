@@ -4,9 +4,10 @@
   "description": "An app that upscales anime images with waifu2x",
   "main": "dist/main/index.js",
   "scripts": {
-    "start": "npm run clean && rsbuild build && electron dist/main/index.js",
-    "build": "npm run clean ./build && rsbuild build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder -p never",
+    "start": "npm run clean && rsbuild build && npm run copy && electron dist/main/index.js",
+    "build": "npm run clean ./build && rsbuild build && npm run copy &&cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder -p never",
     "rebuild": "electron-rebuild -f -w @napi-rs/canvas",
+    "copy": "cp structures/pdf.worker.min.mjs dist/main/pdf.worker.min.mjs ",
     "prune": "node prune.ts",
     "clean": "del-cli ./dist"
   },
@@ -131,6 +132,6 @@
     "react-sortablejs": "^6.1.4",
     "shade-blend-color": "^1.0.0",
     "sharp": "^0.34.5",
-    "waifu2x": "^1.5.3"
+    "waifu2x": "^1.5.4"
   }
 }
