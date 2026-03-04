@@ -7,11 +7,11 @@ This is an app that can upscale anime images, gifs, and videos using waifu2x, Re
 Note: Upscaling videos and gifs will take a very long time without a high-end graphics card.
 
 ### Features:
-- Upscale and/or denoise images (png, jpg, webp, etc.)
-- Upscale and/or denoise animated images (gif, animated webp)
-- Upscale and/or denoise videos (mp4, webm, ogv, etc.)
+- Upscale and/or denoise images (jpg, png, webp, avif)
+- Upscale and/or denoise animated images (gif, animated webp, animated png)
+- Upscale and/or denoise videos (mp4, webm)
 - Upscale and/or denoise PDFs (pdf)
-- Apply effects such as speed or reverse (animated images/videos)
+- Apply effects such as speed or reverse
 - Customize settings (noise, scale, mode, framerate, etc.)
 - Upscale multiple images (or multiple frames of an animated image/video) concurrently
 - Change the upscaler (waifu2x, Real-ESRGAN, Real-CUGAN, or custom)
