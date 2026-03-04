@@ -1,7 +1,7 @@
 {
   "name": "waifu2x-upscaler",
   "version": "1.0.0",
-  "description": "An app that upscales anime images with waifu2x",
+  "description": "A cute image upscaler!",
   "main": "dist/main/index.js",
   "scripts": {
     "start": "npm run clean && rsbuild build && npm run copy && electron dist/main/index.js",

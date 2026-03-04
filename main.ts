@@ -711,9 +711,7 @@ const applicationMenu = () =>  {
       submenu: [
         {role: "reload"},
         {role: "forceReload"},
-        {role: "toggleDevTools"},
-        {type: "separator"},
-        {label: "Online Support", click: () => shell.openExternal(pack.repository.url)}
+        {role: "toggleDevTools"}
       ]
     }
   ]
