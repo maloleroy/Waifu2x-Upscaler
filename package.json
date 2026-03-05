@@ -50,7 +50,7 @@
     },
     "win": {
       "target": {
-        "target": "nsis",
+        "target": "appx",
         "arch": "x64"
       },
       "extraFiles": [
