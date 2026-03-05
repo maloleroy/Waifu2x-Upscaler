@@ -16,7 +16,6 @@ import waifu2x from "waifu2x"
 import imagesMeta from "images-meta"
 import functions from "./structures/functions"
 import mainFunctions from "./structures/mainFunctions"
-import pack from "./package.json"
 
 process.setMaxListeners(0)
 let window: Electron.BrowserWindow | null
@@ -92,6 +91,18 @@ ipcMain.handle("shell:openPath", (event, location: string) => {
 
 ipcMain.handle("shell:showItemInFolder", (event, location: string) => {
   shell.showItemInFolder(path.normalize(location))
+})
+
+ipcMain.handle("path:basename", (event, pathname: string, suffix?: string) => {
+  return path.basename(pathname, suffix)
+})
+
+ipcMain.handle("path:extname", (event, pathname: string) => {
+  return path.extname(pathname)
+})
+
+ipcMain.handle("path:normalize", (event, pathname: string) => {
+  return path.normalize(pathname)
 })
 
 const quickProcess = async (image: string) => {
@@ -390,7 +401,7 @@ const upscale = async (info: any) => {
     transparentColor: info.gifTransparency ? "#000000" : undefined,
     pitch: info.pitch,
     sdColorSpace: info.sdColorSpace,
-    upscaler: functions.escape(info.upscaler),
+    upscaler: mainFunctions.escape(info.upscaler),
     pngFrames: info.pngFrames,
     downscaleHeight: info.pdfDownscale ? Number(info.pdfDownscale) : undefined,
     pythonDownscale: info.pythonDownscale ? Number(info.pythonDownscale) : undefined,
@@ -406,7 +417,7 @@ const upscale = async (info: any) => {
   if (process.platform !== "win32") {
     info.source = info.source.replace("file://", "")
   }
-  info.source = functions.escape(info.source)
+  info.source = mainFunctions.escape(info.source)
   let overwrite = false
   if (info.dest.startsWith("{source}")) {
     if (!options.rename) overwrite = true

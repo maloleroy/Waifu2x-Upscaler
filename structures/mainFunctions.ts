@@ -63,6 +63,10 @@ export default class MainFunctions {
         }
         return newDest
     }
+    
+    public static escape = (str: string) => {
+        return path.normalize(str).replace(/(?<!\\)\\(?!\\)/g, "/")
+    }
 
     public static removeDirectory = (dir: string) => {
         if (dir === "/" || dir === "./") return

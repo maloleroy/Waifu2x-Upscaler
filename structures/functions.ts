@@ -7,8 +7,6 @@
  * Licensed under CC BY-NC 4.0. See license.txt for details. *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-import path from "path"
-
 export default class Functions {
     public static arrayIncludes = (str: string, arr: string[]) => {
         for (let i = 0; i < arr.length; i++) {
@@ -18,9 +16,9 @@ export default class Functions {
     }
 
     public static cleanTitle = (str: string) => {
-        const ext = path.extname(str)
-        const split = str.match(/.{1,30}/g)?.join(" ").replace(ext, "")!
-        return `${split.slice(0, 70)}${ext}`
+        const ext = str.split(".").pop() ?? ""
+        const split = str.match(/.{1,30}/g)?.join(" ").replace(`.${ext}`, "")!
+        return `${split.slice(0, 70)}.${ext}`
     }
 
 
@@ -38,7 +36,9 @@ export default class Functions {
         return count
     }
 
-    public static escape = (str: string) => {
-        return path.normalize(str).replace(/(?<!\\)\\(?!\\)/g, "/")
+    public static basename = (str: string, suffix?: boolean) => {
+        let sep = window.platform === "windows" ? "\\" : "/"
+        let base = str.split(sep).pop() ?? ""
+        return suffix ? base : base.replace(/\.[^/.]+$/, "")
     }
 }

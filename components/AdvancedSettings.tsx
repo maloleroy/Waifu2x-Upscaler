@@ -9,7 +9,7 @@ import {useUpscaleSelector, useUpscaleActions, useActionSelector, useActionActio
 import CheckboxIcon from "../assets/svg/checkbox.svg"
 import CheckboxCheckedIcon from "../assets/svg/checkbox-checked.svg"
 import {Dropdown, DropdownButton} from "react-bootstrap"
-import path from "path"
+import functions from "../structures/functions"
 import "./styles/advancedsettings.less"
 
 const AdvancedSettings: React.FunctionComponent = (props) => {
@@ -25,8 +25,7 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         setUpscaler, setCompress, setFPSMultiplier, setPNGFrames, setPDFDownscale,
         setPythonDownscale
     } = useUpscaleActions()
-
-    const [pythonModels, setPythonModels] = useState([])
+    const [pythonModels, setPythonModels] = useState([] as string[])
 
     useEffect(() => {
         const showSettingsDialog = (event: any, update: any) => {
@@ -342,13 +341,15 @@ const AdvancedSettings: React.FunctionComponent = (props) => {
         if (upscaler === "real-esrgan") return "Real-ESRGAN"
         if (upscaler === "real-cugan") return "Real-CUGAN"
         if (upscaler === "anime4k") return "Anime4K"
-        return path.basename(upscaler, path.extname(upscaler))
+        return functions.basename(upscaler)
     }
 
     const pythonModelsJSX = () => {
         let jsx = [] as any
         for (let i = 0; i < pythonModels.length; i++) {
-            jsx.push(<Dropdown.Item active={upscaler === pythonModels[i]} onClick={() => setUpscaler(pythonModels[i])}>{path.basename(pythonModels[i], path.extname(pythonModels[i]))}</Dropdown.Item>)
+            let sep = window.platform === "windows" ? "\\" : "/"
+            let model = pythonModels[i].split(sep).pop()?.replace(/\.[^/.]+$/, "")
+            jsx.push(<Dropdown.Item active={upscaler === pythonModels[i]} onClick={() => setUpscaler(pythonModels[i])}>{model}</Dropdown.Item>)
         }
         return jsx
     }

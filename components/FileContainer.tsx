@@ -15,7 +15,6 @@ import CloseContainerIcon from "../assets/svg/close-container.svg"
 import LocationIcon from "../assets/svg/location.svg"
 import TrashIcon from "../assets/svg/trash.svg"
 import functions from "../structures/functions"
-import path from "path"
 import "./styles/filecontainer.less"
 
 interface FileContainerProps {
@@ -299,12 +298,12 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
         }, 200)
     }
 
-    const openLocation = (direct?: boolean) => {
+    const openLocation = async (direct?: boolean) => {
         const location = showNew ? output : props.source
         if (direct) {
-            window.shell.openPath(path.normalize(location))
+            window.shell.openPath(await window.path.normalize(location))
         } else {
-            window.shell.showItemInFolder(path.normalize(location))
+            window.shell.showItemInFolder(await window.path.normalize(location))
         }
     }
 
@@ -356,7 +355,7 @@ const FileContainer: React.FunctionComponent<FileContainerProps> = (props: FileC
             <div className="file-middle">
                 <div className="file-group-top">
                     <div className="file-name">
-                        <p className="file-text bigger"><span className="hover" onClick={() => openLocation(true)}>{functions.cleanTitle(path.basename(props.source))}</span></p>
+                        <p className="file-text bigger"><span className="hover" onClick={() => openLocation(true)}>{functions.cleanTitle(functions.basename(props.source))}</span></p>
                         {showNew ? 
                         <ContractIcon className="file-expand" onClick={toggleNew}/> :
                         <ExpandIcon className="file-expand" onClick={toggleNew}/>}
