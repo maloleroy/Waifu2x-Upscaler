@@ -7,8 +7,8 @@
 import {app, BrowserWindow, Menu, MenuItemConstructorOptions, dialog, ipcMain, shell} from "electron"
 import localShortcut from "electron-localshortcut"
 import Store from "electron-store"
-import dragAddon from "electron-click-drag-plugin"
 import fs from "fs"
+import os from "os"
 import path from "path"
 import sharp from "sharp"
 import process from "process"
@@ -18,6 +18,13 @@ import functions from "./structures/functions"
 import mainFunctions from "./structures/mainFunctions"
 
 process.setMaxListeners(0)
+
+if (process.platform === "linux" && app.isPackaged) {
+  app.commandLine.appendSwitch("no-sandbox")
+  app.commandLine.appendSwitch("disable-setuid-sandbox")
+  app.commandLine.appendSwitch("disable-dev-shm-usage")
+}
+
 let window: Electron.BrowserWindow | null
 
 const appRootPath = app.isPackaged ? path.dirname(process.execPath) : path.resolve(__dirname, "../..")
@@ -31,7 +38,7 @@ const ffmpegExecutable = process.platform === "win32"
     ? "ffmpeg.app"
     : "ffmpeg"
 
-let ffmpegPath = path.join(appRootPath, "ffmpeg", ffmpegExecutable)
+let ffmpegPath: string | undefined = path.join(appRootPath, "ffmpeg", ffmpegExecutable)
 let modelPath = path.join(appRootPath, "models")
 
 let waifu2xPath = path.join(unpackedNodeModulesPath, "waifu2x", "waifu2x")
@@ -60,6 +67,28 @@ const history: Array<{id: number, source: string, dest: string, type: "image" | 
 const active: Array<{id: number, source: string, dest: string, type: "image" | "gif" | "video", action: null | "stop"}> = []
 const queue: Array<{started: boolean, info: any}> = []
 
+const ensureParentDirectory = (filePath: string) => {
+  fs.mkdirSync(path.dirname(filePath), {recursive: true})
+}
+
+const makeAsciiSafeImageWorkspace = (source: string, dest: string) => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "waifu2x-upscaler-"))
+  const stagedSource = path.join(tempRoot, `source${path.extname(source).toLowerCase()}`)
+  const stagedDest = path.join(tempRoot, `output${path.extname(dest).toLowerCase()}`)
+  fs.copyFileSync(source, stagedSource)
+  return {tempRoot, stagedSource, stagedDest}
+}
+
+const materializeStagedOutput = (stagedOutput: string, finalDest: string) => {
+  const finalOutput = path.join(
+    path.dirname(finalDest),
+    `${path.basename(finalDest, path.extname(finalDest))}${path.extname(stagedOutput)}`
+  )
+  ensureParentDirectory(finalOutput)
+  fs.copyFileSync(stagedOutput, finalOutput)
+  return path.normalize(finalOutput).replace(/\\/g, "/")
+}
+
 ipcMain.handle("close", (event) => {
     const win = BrowserWindow.fromWebContents(event.sender)
     win?.close()
@@ -79,14 +108,6 @@ ipcMain.handle("maximize", (event) => {
     } else {
       win.maximize()
     }
-})
-
-ipcMain.on("moveWindow", (event) => {
-  const win = BrowserWindow.fromWebContents(event.sender)
-  const handle = win?.getNativeWindowHandle()
-  if (!handle) return
-  const windowID = process.platform === "linux" ? handle.readUInt32LE(0) : handle
-  dragAddon.startDrag(windowID)
 })
 
 ipcMain.handle("shell:openPath", (event, location: string) => {
@@ -431,6 +452,7 @@ const upscale = async (info: any) => {
   const duplicate = active.find((a) => a.dest === dest)
   if (!overwrite && (fs.existsSync(dest) || duplicate)) dest = mainFunctions.newDest(dest, active)
   dest = dest.replace(/\\/g, "/")
+  ensureParentDirectory(dest)
   const action = (percent?: number) => {
     const index = active.findIndex((e) => e.id === info.id)
     if (index !== -1) {
@@ -471,11 +493,16 @@ const upscale = async (info: any) => {
   let outputImage = ""
   try {
     if (info.type === "image") {
+      const useAsciiSafeWorkspace = process.platform === "linux" &&
+        (app.isPackaged || mainFunctions.hasNonAsciiPath(info.source) || mainFunctions.hasNonAsciiPath(dest))
+      const asciiSafeWorkspace = useAsciiSafeWorkspace ? makeAsciiSafeImageWorkspace(info.source, dest) : null
+      let sourcePath = asciiSafeWorkspace ? asciiSafeWorkspace.stagedSource : info.source
+      let targetDest = asciiSafeWorkspace ? asciiSafeWorkspace.stagedDest : dest
       let meta = []
       try {
-        const buffer = fs.readFileSync(info.source)
+        const buffer = fs.readFileSync(sourcePath)
         let inMime = "image/jpeg"
-        if (path.extname(info.source) === ".png") inMime = "image/png"
+        if (path.extname(sourcePath) === ".png") inMime = "image/png"
         meta = imagesMeta.readMeta(buffer, inMime)
         for (let i = 0; i < meta.length; i++) {
           if (typeof meta[i].value !== "string") meta[i].value = ""
@@ -484,23 +511,23 @@ const upscale = async (info: any) => {
       } catch {}
       let avif = false
       let jxl = false
-      let sourceExt = path.extname(info.source)
-      if (path.extname(info.source) === ".avif" || path.extname(info.source) === ".jxl") {
-        if (path.extname(info.source) === ".avif") avif = true
-        if (path.extname(info.source) === ".jxl") jxl = true
-        const buffer = await sharp(fs.readFileSync(info.source), {limitInputPixels: false}).png().toBuffer()
-        const newDest = dest.replace(path.extname(dest), ".png")
+      let sourceExt = path.extname(sourcePath)
+      if (path.extname(sourcePath) === ".avif" || path.extname(sourcePath) === ".jxl") {
+        if (path.extname(sourcePath) === ".avif") avif = true
+        if (path.extname(sourcePath) === ".jxl") jxl = true
+        const buffer = await sharp(fs.readFileSync(sourcePath), {limitInputPixels: false}).png().toBuffer()
+        const newDest = targetDest.replace(path.extname(targetDest), ".png")
         fs.writeFileSync(newDest, buffer)
-        info.source = newDest
-        dest = newDest
+        sourcePath = newDest
+        targetDest = newDest
       }
-      output = await waifu2x.upscaleImage(info.source, dest, options, action)
+      output = await waifu2x.upscaleImage(sourcePath, targetDest, options, action)
       if (avif || jxl) {
-        let buffer = sharp(fs.readFileSync(dest), {limitInputPixels: false})
+        let buffer = sharp(fs.readFileSync(targetDest), {limitInputPixels: false})
         if (avif) buffer = buffer.avif({quality: options.jpgWebpQuality})
         if (jxl) buffer = buffer.jxl({quality: options.jpgWebpQuality})
-        const newDest = dest.replace(path.extname(dest), sourceExt)
-        fs.renameSync(dest, newDest)
+        const newDest = targetDest.replace(path.extname(targetDest), sourceExt)
+        fs.renameSync(targetDest, newDest)
         fs.writeFileSync(newDest, await buffer.toBuffer())
         output = newDest
       }
@@ -517,6 +544,10 @@ const upscale = async (info: any) => {
         if (path.extname(output) === ".png") outMime = "image/png"
         let metaBuffer = imagesMeta.writeMeta(fs.readFileSync(output), outMime, meta, "buffer")
         fs.writeFileSync(output, metaBuffer)
+      }
+      if (asciiSafeWorkspace) {
+        output = materializeStagedOutput(output, dest)
+        mainFunctions.removeDirectory(asciiSafeWorkspace.tempRoot)
       }
     } else if (info.type === "gif") {
       output = await waifu2x.upscaleGIF(info.source, dest, options, progress)

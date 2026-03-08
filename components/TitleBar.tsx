@@ -29,10 +29,6 @@ const TitleBar: React.FunctionComponent = () => {
     const {setTheme, setOS, setTransparent, setPinned} = useThemeActions()
     const [iconHover, setIconHover] = useState(false)
 
-    const onMouseDown = () => {
-        window.ipcRenderer.send("moveWindow")
-    }
-
     const close = () => {
         window.ipcRenderer.invoke("close")
     }
@@ -133,7 +129,7 @@ const TitleBar: React.FunctionComponent = () => {
     }
 
     return (
-        <section className="title-bar" onMouseDown={onMouseDown}>
+        <section className="title-bar">
                 <div className="title-bar-drag-area">
                     {os === "mac" ? macTitleBar() : windowsTitleBar()}
                 </div>

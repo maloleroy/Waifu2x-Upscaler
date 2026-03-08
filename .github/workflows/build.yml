@@ -39,6 +39,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfuse2 imagemagick xvfb
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -67,6 +73,20 @@ jobs:
               mv "$f" "$nf"
             fi
           done
+
+      - name: Smoke test Linux AppImage
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          APPIMAGE=$(find build -maxdepth 1 -name '*.AppImage' | head -n 1)
+          chmod +x "$APPIMAGE"
+          set +e
+          xvfb-run -a timeout 20s "$APPIMAGE"
+          status=$?
+          set -e
+          if [ "$status" -ne 0 ] && [ "$status" -ne 124 ]; then
+            exit "$status"
+          fi
 
       - name: Upload macOS
         if: runner.os == 'macOS'

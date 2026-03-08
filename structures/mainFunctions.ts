@@ -57,11 +57,15 @@ export default class MainFunctions {
         let i = 1
         let newDest = dest
         while (fs.existsSync(newDest) || duplicate) {
-            newDest = `${path.dirname(dest)}\\${path.basename(dest, path.extname(dest))}_${i}${path.extname(dest)}`
+            newDest = path.join(path.dirname(dest), `${path.basename(dest, path.extname(dest))}_${i}${path.extname(dest)}`)
             duplicate = active.find((a) => a.dest === newDest)
             i++
         }
         return newDest
+    }
+
+    public static hasNonAsciiPath = (str: string) => {
+        return /[^\x00-\x7F]/.test(str)
     }
     
     public static escape = (str: string) => {
