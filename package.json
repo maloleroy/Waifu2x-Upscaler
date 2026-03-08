@@ -100,6 +100,8 @@
     },
     "asar": true,
     "asarUnpack": [
+      "node_modules/@img/**/*",
+      "node_modules/sharp/**/*",
       "node_modules/waifu2x",
       "node_modules/rife-fps",
       "node_modules/**/*.node"
