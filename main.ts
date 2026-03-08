@@ -20,33 +20,37 @@ import mainFunctions from "./structures/mainFunctions"
 process.setMaxListeners(0)
 let window: Electron.BrowserWindow | null
 
-let ffmpegPath = undefined as any
-if (process.platform === "linux") ffmpegPath = path.join(app.getAppPath(), "../../ffmpeg/ffmpeg")
-if (process.platform === "darwin") ffmpegPath = path.join(app.getAppPath(), "../../ffmpeg/ffmpeg.app")
-if (process.platform === "win32") ffmpegPath = path.join(app.getAppPath(), "../../ffmpeg/ffmpeg.exe")
+const appRootPath = app.isPackaged ? path.dirname(process.execPath) : path.resolve(__dirname, "../..")
+const unpackedNodeModulesPath = app.isPackaged
+  ? path.join(process.resourcesPath, "app.asar.unpacked", "node_modules")
+  : path.join(appRootPath, "node_modules")
 
-let modelPath = undefined as any
-if (process.platform === "linux") modelPath = path.join(app.getAppPath(), "../../models")
-if (process.platform === "darwin") modelPath = path.join(app.getAppPath(), "../../models")
-if (process.platform === "win32") modelPath = path.join(app.getAppPath(), "../../models")
+const ffmpegExecutable = process.platform === "win32"
+  ? "ffmpeg.exe"
+  : process.platform === "darwin"
+    ? "ffmpeg.app"
+    : "ffmpeg"
 
-let waifu2xPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/waifu2x")
-let esrganPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/real-esrgan")
-let cuganPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/real-cugan")
-let anime4kPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/anime4k")
-let webpPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/webp")
-let rifePath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/rife-fps/rife")
-let scriptsPath = path.join(app.getAppPath(), "../app.asar.unpacked/node_modules/waifu2x/scripts")
+let ffmpegPath = path.join(appRootPath, "ffmpeg", ffmpegExecutable)
+let modelPath = path.join(appRootPath, "models")
+
+let waifu2xPath = path.join(unpackedNodeModulesPath, "waifu2x", "waifu2x")
+let esrganPath = path.join(unpackedNodeModulesPath, "waifu2x", "real-esrgan")
+let cuganPath = path.join(unpackedNodeModulesPath, "waifu2x", "real-cugan")
+let anime4kPath = path.join(unpackedNodeModulesPath, "waifu2x", "anime4k")
+let webpPath = path.join(unpackedNodeModulesPath, "waifu2x", "webp")
+let rifePath = path.join(unpackedNodeModulesPath, "rife-fps", "rife")
+let scriptsPath = path.join(unpackedNodeModulesPath, "waifu2x", "scripts")
 
 if (!fs.existsSync(ffmpegPath)) ffmpegPath = undefined
-if (!fs.existsSync(modelPath)) modelPath = path.join(__dirname, "../../models")
-if (!fs.existsSync(waifu2xPath)) waifu2xPath = path.join(__dirname, "../../waifu2x")
-if (!fs.existsSync(esrganPath)) esrganPath = path.join(__dirname, "../../real-esrgan")
-if (!fs.existsSync(cuganPath)) cuganPath = path.join(__dirname, "../../real-cugan")
-if (!fs.existsSync(anime4kPath)) anime4kPath = path.join(__dirname, "../../anime4k")
-if (!fs.existsSync(webpPath)) webpPath = path.join(__dirname, "../../webp")
-if (!fs.existsSync(scriptsPath)) scriptsPath = path.join(__dirname, "../../scripts")
-if (!fs.existsSync(rifePath)) rifePath = path.join(__dirname, "../../rife")
+if (!fs.existsSync(modelPath)) modelPath = path.join(appRootPath, "models")
+if (!fs.existsSync(waifu2xPath)) waifu2xPath = path.join(appRootPath, "node_modules", "waifu2x", "waifu2x")
+if (!fs.existsSync(esrganPath)) esrganPath = path.join(appRootPath, "node_modules", "waifu2x", "real-esrgan")
+if (!fs.existsSync(cuganPath)) cuganPath = path.join(appRootPath, "node_modules", "waifu2x", "real-cugan")
+if (!fs.existsSync(anime4kPath)) anime4kPath = path.join(appRootPath, "node_modules", "waifu2x", "anime4k")
+if (!fs.existsSync(webpPath)) webpPath = path.join(appRootPath, "node_modules", "waifu2x", "webp")
+if (!fs.existsSync(scriptsPath)) scriptsPath = path.join(appRootPath, "node_modules", "waifu2x", "scripts")
+if (!fs.existsSync(rifePath)) rifePath = path.join(appRootPath, "node_modules", "rife-fps", "rife")
 
 const store = new Store()
 let initialTransparent = process.platform === "win32" ? store.get("transparent", false) as boolean : true
@@ -750,7 +754,13 @@ if (!singleLock) {
     window.setOpacity(windowOpacity / 100)
     applicationMenu()
     if (process.platform !== "win32") {
-      if (ffmpegPath) fs.chmodSync(ffmpegPath, "777")
+      if (ffmpegPath && fs.existsSync(ffmpegPath)) {
+        try {
+          fs.chmodSync(ffmpegPath, 0o755)
+        } catch (error: any) {
+          if (error?.code !== "EROFS" && error?.code !== "EPERM") throw error
+        }
+      }
     }
     localShortcut.register(window, "Control+Shift+I", () => {
       window?.webContents.openDevTools()
