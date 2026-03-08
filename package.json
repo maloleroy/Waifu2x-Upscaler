@@ -103,6 +103,7 @@
       "owner": "Moebytes",
       "releaseType": "draft"
     },
+    "afterPack": "./electron-builder.afterPack.js",
     "asar": true,
     "asarUnpack": [
       "node_modules/@img/**/*",
